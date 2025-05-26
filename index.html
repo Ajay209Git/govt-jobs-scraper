@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Latest Government Jobs - State Wise</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f9f9f9; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; background: #fff; }
+    th, td { padding: 0.75em; border: 1px solid #ccc; text-align: left; }
+    th { background: #f0f0f0; }
+    tr:hover { background: #f5f5ff; }
+    caption { caption-side: top; font-size: 1.2em; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Latest Government Jobs (State-wise)</h1>
+  <div id="jobsTables"></div>
+  <script>
+    fetch('jobs.json')
+      .then(response => response.json())
+      .then(jobs => {
+        if (!jobs.length) {
+          document.getElementById('jobsTables').innerHTML = "<p>No jobs found.</p>";
+          return;
+        }
+        const stateGroups = {};
+        jobs.forEach(job => {
+          const state = job.state || "Other";
+          if (!stateGroups[state]) stateGroups[state] = [];
+          stateGroups[state].push(job);
+        });
+        const states = Object.keys(stateGroups).sort();
+        let html = '';
+        states.forEach(state => {
+          html += `<h2>${state}</h2>`;
+          html += `<table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Source</th>
+                  <th>Link</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+          stateGroups[state].forEach(job => {
+            html += `
+              <tr>
+                <td>${job.title}</td>
+                <td>${job.source || ''}</td>
+                <td><a href="${job.link}" target="_blank">View</a></td>
+              </tr>
+            `;
+          });
+          html += `</tbody></table>`;
+        });
+        document.getElementById('jobsTables').innerHTML = html;
+      })
+      .catch(err => {
+        document.getElementById('jobsTables').innerHTML = "<p>Failed to load jobs.</p>";
+      });
+  </script>
+</body>
+</html>
